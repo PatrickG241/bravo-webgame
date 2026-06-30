@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bravo Concept</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-page="concept">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary border-bottom border-dark-subtle">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="../index.html">
+        <i class="bi bi-car-front-fill me-1 p-2 border rounded-circle"></i>
+        Bravo Concept
+      </a>
+      <div class="collapse navbar-collapse">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link active" href="concept.html">Concept</a></li>
+          <li class="nav-item"><a class="nav-link" href="../index.html">Full game</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container py-4">
+    <section class="instruction-bar mb-3">
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <div>
+          <p class="eyebrow mb-1">Concept mode</p>
+          <p class="mb-0 text-muted">A tiny prototype: steer a single lane and score by dodging one obstacle at a time.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <label class="visually-hidden" for="playerName">Player name</label>
+          <input id="playerName" class="form-control" placeholder="Guest" aria-label="Player name">
+          <p id="greetPlayer" class="mb-0 small text-muted"></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="row g-3">
+      <div class="col-lg-8">
+        <div class="road-panel p-3 rounded-4 shadow-sm bg-light border">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h2 class="h5 mb-1">Tiny dodge lane</h2>
+              <p class="text-muted mb-0">Press the button to move left or right and avoid the obstacle.</p>
+            </div>
+            <span id="conceptStatus" class="badge text-bg-info">Ready</span>
+          </div>
+          <div id="conceptBoard" class="road-board position-relative">
+            <div class="road-lane road-lane-left"></div>
+            <div class="road-lane road-lane-center"></div>
+            <div class="road-lane road-lane-right"></div>
+            <div id="conceptVehicle" class="player-car"></div>
+            <div id="conceptObstacle" class="obstacle"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="flag-panel p-3 rounded-4 shadow-sm bg-light border">
+          <h2 class="h6 mb-3">Concept score</h2>
+          <div class="score-chip mb-3"><span class="score-label">Score</span><strong id="conceptScore">0</strong></div>
+          <div class="score-chip mb-3"><span class="score-label">Best</span><strong id="conceptBest">0</strong></div>
+          <button id="conceptMoveBtn" class="btn btn-outline-primary w-100 mb-2">Move lane</button>
+          <button id="conceptResetBtn" class="btn btn-outline-secondary w-100">Reset</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/main.js"></script>
+</body>
+</html>
