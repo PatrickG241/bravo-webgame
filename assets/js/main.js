@@ -15,15 +15,16 @@ const gameState = {
   spawnInterval: null,
   highScore: 0,
   playerName: '',
+  isNewHighScore: false,
 };
 
 const roadBoard = document.getElementById('roadBoard');
 const vehicleElement = document.getElementById('vehicle');
-const leftFlags = document.getElementById('leftFlags');
-const rightFlags = document.getElementById('rightFlags');
+const boardScoreValue = document.getElementById('boardScoreValue');
 const leaderboardList = document.getElementById('leaderboardList');
 const playerNameInput = document.getElementById('playerName');
 const gameStatus = document.getElementById('gameStatus');
+let gameOverModal = null;
 
 const conceptState = {
   score: 0,
@@ -33,6 +34,12 @@ const conceptState = {
 };
 
 function initPage() {
+  // Initialize the modal after DOM is ready (only if it exists)
+  const gameOverModalElement = document.getElementById('gameOverModal');
+  if (gameOverModalElement) {
+    gameOverModal = new bootstrap.Modal(gameOverModalElement);
+  }
+  
   if (document.body.dataset.page === 'concept') {
     initConceptGame();
     return;
@@ -48,7 +55,6 @@ function initFullGame() {
   }
 
   gameState.highScore = Number(sessionStorage.getItem(SESSION_BEST_KEY) || 0);
-  renderFlags();
   renderLeaderboard();
   updateStats();
   bindEvents();
@@ -56,8 +62,23 @@ function initFullGame() {
 }
 
 function bindEvents() {
-  document.getElementById('startGameBtn').addEventListener('click', startGame);
-  document.getElementById('resetGameBtn').addEventListener('click', resetGame);
+  const startGameBtn = document.getElementById('startGameBtn');
+  const resetGameBtn = document.getElementById('resetGameBtn');
+  
+  if (startGameBtn) {
+    startGameBtn.addEventListener('click', startGame);
+  }
+  if (resetGameBtn) {
+    resetGameBtn.addEventListener('click', resetGame);
+  }
+  
+  const playAgainBtn = document.getElementById('playAgainBtn');
+  if (playAgainBtn) {
+    playAgainBtn.addEventListener('click', function () {
+      gameOverModal.hide();
+      startGame();
+    });
+  }
 
   playerNameInput.addEventListener('input', function () {
     gameState.playerName = sanitizeName(this.value);
@@ -107,10 +128,10 @@ function startGame() {
   gameState.lives = 3;
   gameState.lane = 1;
   gameState.obstacles = [];
+  gameState.isNewHighScore = false;
   updatePlayerGreeting();
   updateCarPosition();
   renderObstacles();
-  renderFlags();
   updateStats();
   updateStatus('Drive safe and keep dodging!', 'success');
 
@@ -129,7 +150,6 @@ function resetGame() {
   gameState.obstacles = [];
   updateCarPosition();
   renderObstacles();
-  renderFlags();
   updateStats();
   updateStatus('Reset complete. Press start to drive again.', 'info');
 }
@@ -158,9 +178,14 @@ function gameTick() {
     gameState.speed = 1 + Math.floor(gameState.distance / 90);
   }
 
+  // Check for new high score during gameplay
+  if (gameState.score > gameState.highScore && !gameState.isNewHighScore) {
+    gameState.isNewHighScore = true;
+    updateStatus('🏆 NEW HIGH SCORE! Keep going!', 'success');
+  }
+
   moveObstacles();
   updateStats();
-  renderFlags();
   sessionStorage.setItem(SESSION_SCORE_KEY, String(gameState.score));
 }
 
@@ -170,11 +195,15 @@ function spawnObstacle() {
   }
 
   const lane = Math.floor(Math.random() * 3);
+  const types = ['barrier', 'cone', 'rock', 'oil'];
+  const type = types[Math.floor(Math.random() * types.length)];
+  
   const obstacle = {
     id: Date.now() + Math.random(),
     lane,
     top: -18,
     speed: 2 + gameState.speed * 0.5,
+    type: type,
   };
 
   gameState.obstacles.push(obstacle);
@@ -212,11 +241,27 @@ function detectCollision(obstacle, boardHeight) {
     return false;
   }
 
-  const carTop = boardHeight - 120;
-  const obstacleTop = (obstacle.top / 100) * boardHeight;
-  const overlap = Math.abs(obstacleTop - carTop) < 72;
+  // Car dimensions (from CSS: 4.5rem width, 7rem height)
+  const carHeight = 112; // 7rem in pixels
+  const carBottom = 24; // 1.5rem from bottom
+  const carTop = boardHeight - carBottom - carHeight;
+  
+  // Obstacle dimensions (from CSS: 4.5rem width, 5rem height)
+  const obstacleHeight = 80; // 5rem in pixels
+  const obstacleTopPx = (obstacle.top / 100) * boardHeight;
+  const obstacleBottomPx = obstacleTopPx + obstacleHeight;
+  
+  // Check for actual overlap with a smaller hit box for more forgiveness
+  const hitBoxPadding = 15; // Reduce hit box by 15px on each side
+  const carHitTop = carTop + hitBoxPadding;
+  const carHitBottom = carTop + carHeight - hitBoxPadding;
+  const obstacleHitTop = obstacleTopPx + hitBoxPadding;
+  const obstacleHitBottom = obstacleBottomPx - hitBoxPadding;
+  
+  // Check if the hit boxes overlap
+  const overlaps = carHitBottom > obstacleHitTop && carHitTop < obstacleHitBottom;
 
-  if (overlap) {
+  if (overlaps) {
     gameState.lives -= 1;
     updateStatus('Crash! You hit an obstacle.', 'danger');
 
@@ -237,7 +282,7 @@ function renderObstacles() {
 
   gameState.obstacles.forEach(function (obstacle) {
     const node = document.createElement('div');
-    node.className = 'obstacle';
+    node.className = 'obstacle obstacle-' + obstacle.type;
     node.style.left = `${13 + obstacle.lane * 31}%`;
     node.style.top = `${obstacle.top}%`;
     roadBoard.appendChild(node);
@@ -259,36 +304,11 @@ function moveRight() {
   updateCarPosition();
 }
 
-function renderFlags() {
-  leftFlags.innerHTML = '';
-  rightFlags.innerHTML = '';
-
-  FLAG_THRESHOLDS.forEach(function (threshold) {
-    const isActive = gameState.distance >= threshold;
-    const item = createFlagItem(threshold, isActive);
-    leftFlags.appendChild(item.cloneNode(true));
-    rightFlags.appendChild(item);
-  });
-}
-
-function createFlagItem(threshold, isActive) {
-  const item = document.createElement('div');
-  item.className = 'flag-item' + (isActive ? ' active' : '');
-  item.innerHTML =
-    '<i class="bi bi-flag-fill"></i>' +
-    '<div>' +
-    '<div class="flag-label">Reached ' + threshold + ' points</div>' +
-    '<div class="flag-value">' + (isActive ? 'Passed' : 'Ahead') + '</div>' +
-    '</div>';
-  return item;
-}
-
 function updateStats() {
   document.getElementById('gameScore').textContent = gameState.score;
-  document.getElementById('gameDistance').textContent = gameState.distance;
-  document.getElementById('gameSpeed').textContent = `${gameState.speed}x`;
   document.getElementById('highScore').textContent = gameState.highScore;
   document.getElementById('gameLives').textContent = gameState.lives;
+  boardScoreValue.textContent = gameState.score;
   updatePlayerGreeting();
 }
 
@@ -320,8 +340,44 @@ function endRun() {
   gameState.started = false;
   saveScore();
   renderLeaderboard();
-  updateStatus('Game over. Tap start to try again.', 'danger');
-  alert('Road run over! Your score: ' + gameState.score);
+  
+  // Only show modal if it exists (full game page)
+  if (gameOverModal) {
+    // Update modal content
+    const finalScoreEl = document.getElementById('finalScore');
+    const previousBestEl = document.getElementById('previousBest');
+    const gameOverIconEl = document.getElementById('gameOverIcon');
+    const gameOverTitleEl = document.getElementById('gameOverTitle');
+    const gameOverMessageEl = document.getElementById('gameOverMessage');
+    const newHighScoreSectionEl = document.getElementById('newHighScoreSection');
+    
+    if (finalScoreEl) finalScoreEl.textContent = gameState.score;
+    if (previousBestEl) previousBestEl.textContent = gameState.highScore;
+    
+    if (gameState.isNewHighScore) {
+      updateStatus('🏆 NEW HIGH SCORE: ' + gameState.score + '! Amazing!', 'success');
+      if (gameOverIconEl) gameOverIconEl.textContent = '🏆';
+      if (gameOverTitleEl) gameOverTitleEl.textContent = 'New High Score!';
+      if (gameOverMessageEl) gameOverMessageEl.innerHTML = 'Your score: <strong>' + gameState.score + '</strong>';
+      if (newHighScoreSectionEl) newHighScoreSectionEl.classList.remove('d-none');
+    } else {
+      updateStatus('Game over. Tap start to try again.', 'danger');
+      if (gameOverIconEl) gameOverIconEl.textContent = '🏁';
+      if (gameOverTitleEl) gameOverTitleEl.textContent = 'Road run over!';
+      if (gameOverMessageEl) gameOverMessageEl.innerHTML = 'Your score: <strong>' + gameState.score + '</strong>';
+      if (newHighScoreSectionEl) newHighScoreSectionEl.classList.add('d-none');
+    }
+    
+    // Show the modal
+    gameOverModal.show();
+  } else {
+    // Fallback for concept page
+    if (gameState.isNewHighScore) {
+      updateStatus('🏆 NEW HIGH SCORE: ' + gameState.score + '! Amazing!', 'success');
+    } else {
+      updateStatus('Game over. Tap start to try again.', 'danger');
+    }
+  }
 }
 
 function saveScore() {

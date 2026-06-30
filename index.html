@@ -54,43 +54,31 @@
     </section>
 
     <section class="status-strip mb-3">
-      <div class="row g-2 g-lg-3 align-items-center">
-        <div class="col-6 col-md-4 col-lg-2">
+      <div class="row g-2 align-items-center">
+        <div class="col-4 col-md-3">
           <div class="score-chip h-100"><span class="score-label">Score</span><strong id="gameScore">0</strong></div>
         </div>
-        <div class="col-6 col-md-4 col-lg-2">
-          <div class="score-chip h-100"><span class="score-label">Distance</span><strong id="gameDistance">0</strong></div>
-        </div>
-        <div class="col-6 col-md-4 col-lg-2">
-          <div class="score-chip h-100"><span class="score-label">Speed</span><strong id="gameSpeed">1x</strong></div>
-        </div>
-        <div class="col-6 col-md-4 col-lg-2">
+        <div class="col-4 col-md-3">
           <div class="score-chip h-100"><span class="score-label">High score</span><strong id="highScore">0</strong></div>
         </div>
-        <div class="col-6 col-md-4 col-lg-2">
+        <div class="col-4 col-md-3">
           <div class="score-chip h-100"><span class="score-label">Lives</span><strong id="gameLives">3</strong></div>
         </div>
+        <div class="col-12 col-md-3">
+          <div class="d-flex flex-wrap gap-2 align-items-center justify-content-md-end">
+            <button id="startGameBtn" class="btn btn-primary btn-sm">Start</button>
+            <button id="resetGameBtn" class="btn btn-outline-secondary btn-sm">Reset</button>
+            <button type="button" class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#leaderboardModal">Leaderboard</button>
+          </div>
+        </div>
       </div>
-      <div class="d-flex flex-wrap gap-2 align-items-center mt-3">
-        <button id="startGameBtn" class="btn btn-primary btn-sm">Start</button>
-        <button id="resetGameBtn" class="btn btn-outline-secondary btn-sm">Reset</button>
-        <button type="button" class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#leaderboardModal">Leaderboard</button>
-        <div id="gameStatus" class="badge text-bg-info ms-auto">Ready to race</div>
+      <div class="d-flex align-items-center mt-2">
+        <div id="gameStatus" class="badge text-bg-info">Ready to race</div>
       </div>
     </section>
 
     <section class="row g-3 align-items-start">
-      <div class="col-lg-3">
-        <div class="flag-panel p-3 rounded-4 shadow-sm bg-light border">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="h6 mb-0">Left route</h2>
-            <span class="text-secondary small">Flags</span>
-          </div>
-          <div id="leftFlags" class="flag-track"></div>
-        </div>
-      </div>
-
-      <div class="col-lg-6">
+      <div class="col-12">
         <div class="road-panel rounded-4 shadow-sm p-3 bg-light border">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <div>
@@ -100,6 +88,7 @@
             <span id="roadHint" class="badge text-bg-secondary">Tap to steer</span>
           </div>
           <div id="roadBoard" class="road-board position-relative">
+            <div id="boardScore" class="board-score">Score: <span id="boardScoreValue">0</span></div>
             <div class="road-lane road-lane-left"></div>
             <div class="road-lane road-lane-center"></div>
             <div class="road-lane road-lane-right"></div>
@@ -107,16 +96,6 @@
             <div class="road-line road-line-2"></div>
             <div id="vehicle" class="player-car" aria-label="Player car"></div>
           </div>
-        </div>
-      </div>
-
-      <div class="col-lg-3">
-        <div class="flag-panel p-3 rounded-4 shadow-sm bg-light border">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="h6 mb-0">Right route</h2>
-            <span class="text-secondary small">Flags</span>
-          </div>
-          <div id="rightFlags" class="flag-track"></div>
         </div>
       </div>
     </section>
@@ -141,6 +120,32 @@
         </div>
         <div class="modal-body">
           <ol id="leaderboardList" class="leaderboard list-group list-group-numbered mb-0"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="gameOverModal" tabindex="-1" aria-labelledby="gameOverModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content game-modal">
+        <div class="modal-header border-secondary-subtle">
+          <h2 id="gameOverModalLabel" class="modal-title fs-5">Game Over</h2>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center">
+          <div id="gameOverIcon" class="mb-3">🏁</div>
+          <h3 id="gameOverTitle" class="mb-3">Road run over!</h3>
+          <p id="gameOverMessage" class="mb-4">Your score: <span id="finalScore">0</span></p>
+          <div id="newHighScoreSection" class="d-none mb-3">
+            <div class="alert alert-success">
+              <strong>🏆 NEW HIGH SCORE! 🏆</strong>
+              <p class="mb-0">Previous best: <span id="previousBest">0</span></p>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer border-secondary-subtle">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" id="playAgainBtn">Play Again</button>
         </div>
       </div>
     </div>

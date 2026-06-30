@@ -13,7 +13,7 @@ Step into the driver seat and dodge your way through a neon highway. The concept
 ## About the app
 
 ### Planning links
-- Issue ideas: https://github.com/barrycumbie/bravo-webgame/issues/1
+- Issue ideas: https://github.com/PatrickG241/bravo-webgame/issues/1
 - Planning notes: [pages/README.md](pages/README.md)
 
 ### Project tree

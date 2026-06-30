@@ -53,9 +53,29 @@
   background: linear-gradient(180deg, #1c2335 0%, #111827 100%);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 1.75rem;
-  min-height: 28rem;
+  min-height: 36rem;
   overflow: hidden;
   position: relative;
+}
+
+.board-score {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  color: #f8fafc;
+  font-family: 'Courier New', monospace;
+  font-weight: 700;
+  font-size: 1.1rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  z-index: 10;
+}
+
+.board-score span {
+  color: #38bdf8;
 }
 
 .road-board::after {
@@ -139,12 +159,16 @@
   width: 4.5rem;
   height: 5rem;
   border-radius: 1.1rem;
-  background: linear-gradient(180deg, #f97316, #dc2626);
   box-shadow: 0 12px 18px rgba(0, 0, 0, 0.28);
 }
 
-.obstacle::before,
-.obstacle::after {
+/* Barrier - classic orange/red striped barrier */
+.obstacle-barrier {
+  background: linear-gradient(180deg, #f97316, #dc2626);
+}
+
+.obstacle-barrier::before,
+.obstacle-barrier::after {
   content: '';
   position: absolute;
   left: 0.7rem;
@@ -154,48 +178,103 @@
   border-radius: 0.35rem;
 }
 
-.obstacle::before {
+.obstacle-barrier::before {
   top: 0.8rem;
 }
 
-.obstacle::after {
+.obstacle-barrier::after {
   top: 2.4rem;
 }
 
-.flag-track {
-  display: grid;
-  gap: 0.75rem;
+/* Traffic cone - orange cone shape */
+.obstacle-cone {
+  background: linear-gradient(180deg, #fb923c, #ea580c);
+  border-radius: 0.5rem 0.5rem 2.5rem 2.5rem;
+  height: 4.5rem;
 }
 
-.flag-item {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 0.75rem;
-  align-items: center;
-  padding: 0.8rem;
-  border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+.obstacle-cone::before {
+  content: '';
+  position: absolute;
+  top: 0.3rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1.5rem;
+  height: 1.5rem;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
 }
 
-.flag-item.active {
-  background: rgba(56, 189, 248, 0.15);
-  border-color: rgba(56, 189, 248, 0.4);
+.obstacle-cone::after {
+  content: '';
+  position: absolute;
+  bottom: 0.8rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2rem;
+  height: 0.4rem;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 0.2rem;
 }
 
-.flag-item .bi-flag-fill {
-  font-size: 1.3rem;
-  color: #38bdf8;
+/* Rock - gray irregular shape */
+.obstacle-rock {
+  background: linear-gradient(135deg, #6b7280, #374151);
+  border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+  height: 4rem;
 }
 
-.flag-item .flag-label {
-  color: #e2e8f0;
-  font-size: 0.9rem;
+.obstacle-rock::before {
+  content: '';
+  position: absolute;
+  top: 0.5rem;
+  left: 0.8rem;
+  width: 1rem;
+  height: 0.8rem;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
 }
 
-.flag-item .flag-value {
-  color: #94a3b8;
-  font-size: 0.75rem;
+.obstacle-rock::after {
+  content: '';
+  position: absolute;
+  bottom: 0.6rem;
+  right: 0.6rem;
+  width: 0.8rem;
+  height: 0.6rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+}
+
+/* Oil spill - dark slick puddle */
+.obstacle-oil {
+  background: radial-gradient(ellipse, #1f2937 0%, #111827 70%, transparent 100%);
+  border-radius: 50%;
+  height: 3.5rem;
+  width: 5rem;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+.obstacle-oil::before {
+  content: '';
+  position: absolute;
+  top: 0.8rem;
+  left: 1rem;
+  width: 1.2rem;
+  height: 0.8rem;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+}
+
+.obstacle-oil::after {
+  content: '';
+  position: absolute;
+  bottom: 0.6rem;
+  right: 0.8rem;
+  width: 0.9rem;
+  height: 0.6rem;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 50%;
 }
 
 @keyframes drive {
